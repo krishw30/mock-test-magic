@@ -143,8 +143,8 @@ export function EditTestDialog({ questions, onQuestionsChange }: EditTestDialogP
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <Pencil className="h-4 w-4" />
-          Edit Test
+          <Plus className="h-4 w-4" />
+          Create Test
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">

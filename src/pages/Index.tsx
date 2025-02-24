@@ -5,7 +5,7 @@ import { Question } from "@/components/Question";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { EditTestDialog } from "@/components/EditTestDialog";
-import { Brain, Rocket, Timer as TimerIcon } from "lucide-react";
+import { Brain, TimerIcon, Rocket } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -55,14 +55,10 @@ const Index = () => {
             <p className="mt-3 max-w-md mx-auto text-lg text-gray-600 sm:text-xl md:mt-5 md:max-w-3xl">
               Create engaging tests, track performance, and analyze results in real-time.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-              <EditTestDialog 
-                questions={questions}
-                onQuestionsChange={setQuestions}
-              />
+            <div className="flex justify-center mt-10">
               <Button
-                size="lg"
-                className="font-semibold gap-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:opacity-90 transition-all"
+                variant="outline"
+                className="gap-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:opacity-90 transition-all text-white"
                 onClick={() => {
                   const editTestDialog = document.querySelector("[role='dialog']");
                   if (editTestDialog) {
@@ -70,9 +66,13 @@ const Index = () => {
                   }
                 }}
               >
-                <Rocket className="w-5 h-5" />
-                Create Your First Test
+                <Rocket className="h-4 w-4" />
+                Create Test
               </Button>
+              <EditTestDialog 
+                questions={questions}
+                onQuestionsChange={setQuestions}
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
