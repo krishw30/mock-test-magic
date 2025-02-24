@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Timer } from "@/components/Timer";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -56,14 +57,14 @@ const Index = () => {
             <h2 className="text-2xl font-semibold mb-4">Welcome to the Test Platform</h2>
             <p className="text-gray-500 mb-6">Please add questions using the Edit Test button to begin.</p>
             <div className="flex justify-center">
-              <EditTestDialog 
-                questions={questions}
-                onQuestionsChange={setQuestions}
-              >
-                <Button size="lg" className="font-semibold">
-                  Add Questions
-                </Button>
-              </EditTestDialog>
+              <Button size="lg" className="font-semibold" onClick={() => {
+                const editTestDialog = document.querySelector("[role='dialog']");
+                if (editTestDialog) {
+                  (editTestDialog as HTMLElement).click();
+                }
+              }}>
+                Add Questions
+              </Button>
             </div>
           </div>
         </div>
