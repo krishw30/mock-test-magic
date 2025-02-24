@@ -1,4 +1,13 @@
 
+export interface ImportedJSON {
+  test_name?: string;
+  questions: {
+    question: string;
+    options: Record<string, string>;
+    correct_answer: number;
+  }[];
+}
+
 export const analyzeQuestion = async (question: string, options: string[]) => {
   try {
     const response = await fetch('/api/get-answer', {

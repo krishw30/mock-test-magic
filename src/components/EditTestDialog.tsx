@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
 import { Plus, Trash2, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { analyzeQuestion } from "@/utils/ai-helper";
+import { analyzeQuestion, ImportedJSON } from "@/utils/ai-helper";
 
 interface Question {
   question: string;
