@@ -1,7 +1,7 @@
 
 import type { NextApiRequest, NextApiResponse } from 'next';
 
-const openAIApiKey = process.env.OPENAI_API_KEY;
+const geminiApiKey = process.env.GEMINI_API_KEY;
 
 export default async function handler(
   req: NextApiRequest,
@@ -18,26 +18,27 @@ export default async function handler(
   try {
     const { prompt } = req.body;
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
         'Content-Type': 'application/json',
+        'x-goog-api-key': geminiApiKey,
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { 
-            role: 'system', 
-            content: 'You are a helpful assistant that analyzes multiple choice questions and provides the index of the correct answer. Only respond with the number representing the index of the correct answer (0-3).'
-          },
-          { role: 'user', content: prompt }
-        ],
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 1,
+        }
       }),
     });
 
     const data = await response.json();
-    const generatedText = data.choices[0].message.content;
+    const generatedText = data.candidates[0].content.parts[0].text;
 
     return res.status(200).json({ generatedText });
   } catch (error) {
