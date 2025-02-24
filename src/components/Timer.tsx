@@ -1,5 +1,6 @@
 
 import { useEffect, useState } from "react";
+import { Timer as TimerIcon } from "lucide-react";
 
 interface TimerProps {
   isRunning: boolean;
@@ -34,7 +35,8 @@ export const Timer = ({ isRunning, shouldReset, onTimeUpdate }: TimerProps) => {
   const seconds = time % 60;
 
   return (
-    <div className="bg-white shadow-sm rounded-lg px-4 py-2 text-lg font-semibold">
+    <div className="bg-white shadow-sm rounded-xl px-4 py-2 text-lg font-semibold flex items-center gap-2 border border-gray-100">
+      <TimerIcon className="w-5 h-5 text-primary" />
       {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
     </div>
   );
