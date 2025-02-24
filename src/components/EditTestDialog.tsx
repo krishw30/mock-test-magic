@@ -9,9 +9,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { Plus, Trash2, Settings } from "lucide-react";
+import { Pencil, Plus, Trash2, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { analyzeQuestion, ImportedJSON } from "@/utils/ai-helper";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Question {
   question: string;
@@ -19,6 +25,19 @@ interface Question {
   correctAnswer: number;
   marks?: number;
   negativeMark?: number;
+}
+
+interface ImportedQuestion {
+  question: string;
+  options: {
+    [key: string]: string;
+  };
+  correct_answer: number;
+}
+
+interface ImportedJSON {
+  test_name?: string;
+  questions: ImportedQuestion[];
 }
 
 interface EditTestDialogProps {
@@ -33,10 +52,9 @@ export function EditTestDialog({ questions, onQuestionsChange }: EditTestDialogP
   const [jsonInput, setJsonInput] = useState("");
   const [globalMarks, setGlobalMarks] = useState("2");
   const [globalNegativeMarks, setGlobalNegativeMarks] = useState("-0.66");
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const { toast } = useToast();
 
-  const handleAddQuestion = async () => {
+  const handleAddQuestion = () => {
     if (!newQuestion || newOptions.some(opt => !opt)) {
       toast({
         title: "Invalid Question",
@@ -46,42 +64,21 @@ export function EditTestDialog({ questions, onQuestionsChange }: EditTestDialogP
       return;
     }
 
-    setIsAnalyzing(true);
-    try {
-      const suggestedAnswer = await analyzeQuestion(newQuestion, newOptions);
-      
-      if (suggestedAnswer !== null) {
-        const updatedQuestions = [
-          ...questions,
-          {
-            question: newQuestion,
-            options: [...newOptions],
-            correctAnswer: suggestedAnswer,
-            marks: Number(globalMarks),
-            negativeMark: Number(globalNegativeMarks),
-          },
-        ];
+    const updatedQuestions = [
+      ...questions,
+      {
+        question: newQuestion,
+        options: [...newOptions],
+        correctAnswer: newCorrectAnswer,
+        marks: Number(globalMarks),
+        negativeMark: Number(globalNegativeMarks),
+      },
+    ];
 
-        onQuestionsChange(updatedQuestions);
-        setNewQuestion("");
-        setNewOptions(["", "", "", ""]);
-        setNewCorrectAnswer(0);
-
-        toast({
-          title: "Question Added",
-          description: "AI suggested the correct answer. You can edit it if needed.",
-        });
-      }
-    } catch (error) {
-      console.error('Error adding question:', error);
-      toast({
-        title: "Error",
-        description: "Failed to analyze the question. Please try again or set the answer manually.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsAnalyzing(false);
-    }
+    onQuestionsChange(updatedQuestions);
+    setNewQuestion("");
+    setNewOptions(["", "", "", ""]);
+    setNewCorrectAnswer(0);
   };
 
   const handleDeleteQuestion = (index: number) => {
@@ -146,13 +143,13 @@ export function EditTestDialog({ questions, onQuestionsChange }: EditTestDialogP
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
-          <Plus className="h-4 w-4" />
-          Create Test
+          <Pencil className="h-4 w-4" />
+          Edit Test
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Test Questions</DialogTitle>
+          <DialogTitle>Edit Test Questions</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
@@ -221,14 +218,41 @@ export function EditTestDialog({ questions, onQuestionsChange }: EditTestDialogP
                   <p className="font-medium">{q.question}</p>
                   <ul className="mt-2 space-y-1">
                     {q.options.map((opt, optIndex) => (
-                      <li 
-                        key={optIndex} 
-                        className={optIndex === q.correctAnswer ? "text-green-600 font-medium" : ""}
-                      >
+                      <li key={optIndex} className={optIndex === q.correctAnswer ? "text-green-600 font-medium" : ""}>
                         {opt}
                       </li>
                     ))}
                   </ul>
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    <Input
+                      type="number"
+                      placeholder="Marks"
+                      value={q.marks || globalMarks}
+                      onChange={(e) => {
+                        const updatedQuestions = [...questions];
+                        updatedQuestions[index] = {
+                          ...q,
+                          marks: Number(e.target.value),
+                        };
+                        onQuestionsChange(updatedQuestions);
+                      }}
+                      className="text-sm"
+                    />
+                    <Input
+                      type="number"
+                      placeholder="Negative Marks"
+                      value={q.negativeMark || globalNegativeMarks}
+                      onChange={(e) => {
+                        const updatedQuestions = [...questions];
+                        updatedQuestions[index] = {
+                          ...q,
+                          negativeMark: Number(e.target.value),
+                        };
+                        onQuestionsChange(updatedQuestions);
+                      }}
+                      className="text-sm"
+                    />
+                  </div>
                 </div>
                 <Button
                   variant="ghost"
@@ -260,22 +284,19 @@ export function EditTestDialog({ questions, onQuestionsChange }: EditTestDialogP
                       setNewOptions(updated);
                     }}
                   />
+                  <Button
+                    type="button"
+                    variant={newCorrectAnswer === index ? "default" : "outline"}
+                    onClick={() => setNewCorrectAnswer(index)}
+                  >
+                    Correct
+                  </Button>
                 </div>
               ))}
             </div>
-            <Button 
-              onClick={handleAddQuestion} 
-              className="w-full gap-2"
-              disabled={isAnalyzing}
-            >
-              {isAnalyzing ? (
-                <>Analyzing Question...</>
-              ) : (
-                <>
-                  <Plus className="h-4 w-4" />
-                  Add Question
-                </>
-              )}
+            <Button onClick={handleAddQuestion} className="w-full gap-2">
+              <Plus className="h-4 w-4" />
+              Add Question
             </Button>
           </div>
         </div>

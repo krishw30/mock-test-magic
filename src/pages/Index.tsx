@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Timer } from "@/components/Timer";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -5,12 +6,12 @@ import { Question } from "@/components/Question";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { EditTestDialog } from "@/components/EditTestDialog";
-import { Brain, TimerIcon, Rocket } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Table,
@@ -44,59 +45,26 @@ const Index = () => {
 
   if (questions.length === 0) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] to-[#F2FCE2] py-8 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-            <Brain className="w-16 h-16 mx-auto text-primary" />
-            <h1 className="text-4xl font-bold text-gray-900 tracking-tight sm:text-5xl md:text-6xl">
-              Welcome to the
-              <span className="text-primary block">Smart Test Platform</span>
-            </h1>
-            <p className="mt-3 max-w-md mx-auto text-lg text-gray-600 sm:text-xl md:mt-5 md:max-w-3xl">
-              Create engaging tests, track performance, and analyze results in real-time.
-            </p>
-            <div className="flex justify-center mt-10">
-              <Button
-                variant="outline"
-                className="gap-2 bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:opacity-90 transition-all text-white"
-                onClick={() => {
-                  const editTestDialog = document.querySelector("[role='dialog']");
-                  if (editTestDialog) {
-                    (editTestDialog as HTMLElement).click();
-                  }
-                }}
-              >
-                <Rocket className="h-4 w-4" />
-                Create Test
+      <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-3xl mx-auto space-y-8">
+          <div className="flex items-center justify-between">
+            <EditTestDialog 
+              questions={questions}
+              onQuestionsChange={setQuestions}
+            />
+          </div>
+          <div className="bg-white shadow-sm rounded-xl p-6 text-center">
+            <h2 className="text-2xl font-semibold mb-4">Welcome to the Test Platform</h2>
+            <p className="text-gray-500 mb-6">Please add questions using the Edit Test button to begin.</p>
+            <div className="flex justify-center">
+              <Button size="lg" className="font-semibold" onClick={() => {
+                const editTestDialog = document.querySelector("[role='dialog']");
+                if (editTestDialog) {
+                  (editTestDialog as HTMLElement).click();
+                }
+              }}>
+                Add Questions
               </Button>
-              <EditTestDialog 
-                questions={questions}
-                onQuestionsChange={setQuestions}
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-16">
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Brain className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Smart Analysis</h3>
-                <p className="text-gray-600">Get detailed insights into test performance and participant results.</p>
-              </div>
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <TimerIcon className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Time Tracking</h3>
-                <p className="text-gray-600">Monitor time spent on each question for better assessment.</p>
-              </div>
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl shadow-lg hover:shadow-xl transition-all">
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
-                  <Rocket className="w-6 h-6 text-primary" />
-                </div>
-                <h3 className="text-xl font-semibold mb-2">Instant Results</h3>
-                <p className="text-gray-600">Get immediate feedback and detailed performance metrics.</p>
-              </div>
             </div>
           </div>
         </div>
@@ -267,15 +235,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] to-[#F2FCE2] py-8 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto space-y-8">
-        <div className="flex items-center justify-between bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-sm">
+        <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Button
               onClick={() => setIsStarted(true)}
               disabled={isStarted || isSubmitted}
               variant="outline"
-              className="font-medium hover:bg-primary/5"
             >
               Start Test
             </Button>
@@ -290,40 +257,53 @@ const Index = () => {
               shouldReset={timerReset}
               onTimeUpdate={handleTimeUpdate}
             />
-            <div className="text-sm text-gray-500 font-medium">
+            <div className="text-sm text-gray-500">
               Question {currentQuestion + 1} of {questions.length}
+            </div>
+            <div className="flex flex-wrap gap-2 max-w-[200px]">
+              {questions.map((_, index) => (
+                <Button
+                  key={index}
+                  variant={getButtonVariant(index)}
+                  size="sm"
+                  onClick={() => navigateToQuestion(index)}
+                  className={currentQuestion === index ? "ring-2 ring-primary" : ""}
+                  style={getButtonStyle(index)}
+                >
+                  {index + 1}
+                </Button>
+              ))}
             </div>
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-lg p-6">
-          <ProgressBar current={currentQuestion + 1} total={questions.length} />
-          
-          <div className="mt-6">
-            <Question
-              question={questions[currentQuestion].question}
-              options={questions[currentQuestion].options}
-              onAnswer={handleAnswer}
-              selectedAnswer={answers[currentQuestion]}
-              correctAnswer={isSubmitted ? questions[currentQuestion].correctAnswer : undefined}
-            />
+        <ProgressBar current={currentQuestion + 1} total={questions.length} />
+
+        <div className="bg-white shadow-sm rounded-xl p-6">
+          <Question
+            question={questions[currentQuestion].question}
+            options={questions[currentQuestion].options}
+            onAnswer={handleAnswer}
+            selectedAnswer={answers[currentQuestion]}
+            correctAnswer={isSubmitted ? questions[currentQuestion].correctAnswer : undefined}
+          />
+          <div className="mt-4 text-sm text-gray-500">
+            Time spent on this question: {formatTime(questionTimes[currentQuestion] || 0)}
           </div>
         </div>
 
-        <div className="flex justify-between items-center bg-white/80 backdrop-blur-sm p-4 rounded-xl shadow-sm">
+        <div className="flex justify-between items-center">
           <div className="space-x-4">
             <Button
               variant="outline"
               onClick={handlePrevious}
               disabled={currentQuestion === 0 || !isStarted}
-              className="hover:bg-primary/5"
             >
               Previous
             </Button>
             <Button 
               variant="outline" 
               onClick={handleReset}
-              className="hover:bg-primary/5"
             >
               Reset Test
             </Button>
@@ -331,19 +311,77 @@ const Index = () => {
           
           <div className="space-x-4">
             {isSubmitted && (
-              <Button 
-                variant="secondary"
-                onClick={() => setShowSummary(true)}
-                className="bg-primary/10 hover:bg-primary/20 text-primary"
-              >
-                View Summary
-              </Button>
+              <Dialog open={showSummary} onOpenChange={setShowSummary}>
+                <DialogTrigger asChild>
+                  <Button variant="secondary">View Summary</Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Test Summary</DialogTitle>
+                  </DialogHeader>
+                  <div className="p-6 space-y-4">
+                    {(() => {
+                      const summary = getSummaryText();
+                      return (
+                        <div className="space-y-3">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <p className="text-sm text-gray-500">Total Questions</p>
+                              <p className="text-2xl font-bold">{summary.totalQuestions}</p>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <p className="text-sm text-gray-500">Total Score</p>
+                              <p className="text-2xl font-bold">{summary.totalScore}</p>
+                            </div>
+                            <div className="bg-green-50 p-4 rounded-lg">
+                              <p className="text-sm text-green-600">Correct Answers</p>
+                              <p className="text-2xl font-bold text-green-600">{summary.correctCount}</p>
+                            </div>
+                            <div className="bg-red-50 p-4 rounded-lg">
+                              <p className="text-sm text-red-600">Wrong Answers</p>
+                              <p className="text-2xl font-bold text-red-600">{summary.wrongCount}</p>
+                            </div>
+                            <div className="bg-gray-50 p-4 rounded-lg">
+                              <p className="text-sm text-gray-500">Skipped Questions</p>
+                              <p className="text-2xl font-bold">{summary.skippedCount}</p>
+                            </div>
+                            <div className="bg-blue-50 p-4 rounded-lg">
+                              <p className="text-sm text-blue-600">Accuracy</p>
+                              <p className="text-2xl font-bold text-blue-600">{summary.accuracy}</p>
+                            </div>
+                          </div>
+                          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                            <p className="font-medium">Time Analysis</p>
+                            <div className="grid grid-cols-2 gap-4 text-sm">
+                              <div>
+                                <p className="text-gray-500">Total Time</p>
+                                <p className="font-semibold">{summary.totalTime}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Average Time/Question</p>
+                                <p className="font-semibold">{summary.averageTime}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Fastest Question</p>
+                                <p className="font-semibold">{summary.fastestQuestion}</p>
+                              </div>
+                              <div>
+                                <p className="text-gray-500">Slowest Question</p>
+                                <p className="font-semibold">{summary.slowestQuestion}</p>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </DialogContent>
+              </Dialog>
             )}
             <Button 
               variant="destructive"
               onClick={handleSubmit}
               disabled={isSubmitted || !isStarted}
-              className="hover:opacity-90"
             >
               Submit Test
             </Button>
@@ -353,14 +391,12 @@ const Index = () => {
                   variant="outline" 
                   onClick={handleSkip}
                   disabled={!isStarted}
-                  className="hover:bg-primary/5"
                 >
                   Skip
                 </Button>
                 <Button 
                   onClick={handleSaveAndNext}
                   disabled={answers[currentQuestion] === undefined || !isStarted}
-                  className="bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] hover:opacity-90"
                 >
                   Save & Next
                 </Button>
@@ -373,7 +409,7 @@ const Index = () => {
       <Dialog open={showResults} onOpenChange={setShowResults}>
         <DialogContent className="max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold">Test Results</DialogTitle>
+            <DialogTitle>Test Results</DialogTitle>
           </DialogHeader>
           <div className="p-6">
             <div className="max-h-[60vh] overflow-y-auto">
@@ -416,6 +452,12 @@ const Index = () => {
                       </TableRow>
                     );
                   })}
+                  <TableRow>
+                    <TableCell colSpan={3} className="font-semibold">Total</TableCell>
+                    <TableCell className="font-semibold">{formatTime(totalTime)}</TableCell>
+                    <TableCell colSpan={1}></TableCell>
+                    <TableCell className="font-semibold">{calculateScore().totalScore}</TableCell>
+                  </TableRow>
                 </TableBody>
               </Table>
             </div>

@@ -1,14 +1,12 @@
 
-export interface ImportedJSON {
-  test_name?: string;
-  questions: {
-    question: string;
-    options: Record<string, string>;
-    correct_answer: number;
-  }[];
+import { toast } from "@/components/ui/use-toast";
+
+interface Question {
+  question: string;
+  options: string[];
 }
 
-export const analyzeQuestion = async (question: string, options: string[]) => {
+export const getAIAnswer = async (question: Question) => {
   try {
     const response = await fetch('/api/get-answer', {
       method: 'POST',
@@ -16,21 +14,20 @@ export const analyzeQuestion = async (question: string, options: string[]) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        prompt: `You are an AI that analyzes multiple choice questions. Given the following question and options, respond ONLY with the number (0, 1, 2, or 3) representing the index of the correct answer. No other text or explanation.
-
-Question: ${question}
-
-Options:
-${options.map((opt, idx) => `${idx}. ${opt}`).join('\n')}
-
-Remember: Only respond with a single number (0, 1, 2, or 3).`,
+        prompt: `Given this multiple choice question: "${question.question}"
+                With these options: ${question.options.map((opt, i) => `${i}: ${opt}`).join(', ')}
+                Please analyze and return only the index number (0-${question.options.length - 1}) of the correct answer.`,
       }),
     });
 
     const data = await response.json();
-    return parseInt(data.generatedText.trim());
+    return parseInt(data.generatedText);
   } catch (error) {
-    console.error('Error analyzing question:', error);
+    toast({
+      title: "Error getting AI answer",
+      description: "Could not get an answer from the AI service.",
+      variant: "destructive",
+    });
     return null;
   }
-};
+}
