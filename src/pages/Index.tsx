@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Timer } from "@/components/Timer";
 import { ProgressBar } from "@/components/ProgressBar";
@@ -30,8 +29,32 @@ interface QuestionType {
   negativeMark?: number;
 }
 
+const defaultQuestions = [
+  {
+    question: "What is the capital of France?",
+    options: ["London", "Berlin", "Paris", "Madrid"],
+    correctAnswer: 2,
+    marks: 2,
+    negativeMark: -0.66,
+  },
+  {
+    question: "Which planet is known as the Red Planet?",
+    options: ["Venus", "Mars", "Jupiter", "Saturn"],
+    correctAnswer: 1,
+    marks: 2,
+    negativeMark: -0.66,
+  },
+  {
+    question: "What is 2 + 2?",
+    options: ["3", "4", "5", "6"],
+    correctAnswer: 1,
+    marks: 2,
+    negativeMark: -0.66,
+  },
+];
+
 const Index = () => {
-  const [questions, setQuestions] = useState<QuestionType[]>([]);
+  const [questions, setQuestions] = useState<QuestionType[]>(defaultQuestions);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [questionTimes, setQuestionTimes] = useState<Record<number, number>>({});
@@ -54,18 +77,7 @@ const Index = () => {
             />
           </div>
           <div className="bg-white shadow-sm rounded-xl p-6 text-center">
-            <h2 className="text-2xl font-semibold mb-4">Welcome to the Test Platform</h2>
-            <p className="text-gray-500 mb-6">Please add questions using the Edit Test button to begin.</p>
-            <div className="flex justify-center">
-              <Button size="lg" className="font-semibold" onClick={() => {
-                const editTestDialog = document.querySelector("[role='dialog']");
-                if (editTestDialog) {
-                  (editTestDialog as HTMLElement).click();
-                }
-              }}>
-                Add Questions
-              </Button>
-            </div>
+            <p className="text-gray-500">No questions available. Please add questions using the Edit Test button.</p>
           </div>
         </div>
       </div>
